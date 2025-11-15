@@ -1,4 +1,6 @@
 import java.util.*;
+import java.io.FileWriter;
+import java.io.IOException;
 
 public class CheckOut{
     private LibraryInventory inventory;
@@ -36,5 +38,12 @@ public class CheckOut{
     public int[] getLocation(String name){
         return inventory.findItem(name);
     }
-
+    
+    public void storeInfo(String name){
+        int[] location = getLocation(name);
+        try(){}
+        catch(IOException e){
+            System.out.println("Invalid information, unable to store data");
+        }
+    }
 }
