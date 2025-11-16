@@ -14,5 +14,8 @@ public class Main {
         library.addItem(book2, 0,5);
         library.addItem(book2, 15, 15);
 
+        //test checkout
+        CheckOut bookOut = new CheckOut(library, "IDK", "11/15/2025");
+        bookOut.storeInfo("Cool  book");
     }
 }

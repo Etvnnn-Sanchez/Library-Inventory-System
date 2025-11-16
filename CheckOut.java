@@ -46,7 +46,6 @@ public class CheckOut{
             writer.write("Book: " + name + "\n");
             writer.write("Due Date: " + dueDate + "\n");
             writer.write("Location: [" + location[0] + ", " + location[1] + "]\n");
-            writer.write("----------------------\n");
         }
         catch(IOException e){
             System.out.println("Invalid information, unable to store data");
