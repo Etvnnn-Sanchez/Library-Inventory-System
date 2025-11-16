@@ -39,7 +39,7 @@ public class CheckOut{
         return inventory.findItem(name);
     }
     
-    public void storeInfo(String name){
+    private void storeInfo(String name){
         int[] location = getLocation(name);
         try(FileWriter writer = new FileWriter("checkouts.txt", true)){
             writer.write("Patron: " + patron + "\n");
@@ -50,5 +50,20 @@ public class CheckOut{
         catch(IOException e){
             System.out.println("Invalid information, unable to store data");
         }
+    }
+    public boolean checkoutExists(String name){
+        try(Scanner scanner = new Scanner(new java.io.File("checkouts.txt"))){
+            String target = "Book: " + name;
+            while(scanner.hasNextLine()){
+                String line = scanner.nextLine();
+                if (line.equals(target)) {
+                    return true;
+                }
+            }
+        } 
+        catch(IOException e){
+            System.out.println("Could not read checkouts.txt");
+        }
+        return false;
     }
 }
