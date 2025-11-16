@@ -49,10 +49,4 @@ public abstract class Item {
                 "\nDescription: " + description +
                 "\n" + getItemDetails();
     }
-
-
-
-
-
-
 }

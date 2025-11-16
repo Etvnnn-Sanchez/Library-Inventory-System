@@ -56,13 +56,12 @@ public class LibraryInventory {
         }
         return names;
     }
+
     public int[] findItem(String name){
         for(int shelf = 0; shelf < storage.size(); shelf++){
             for(int compartment = 0; compartment < COMPARTMENTS; compartment++){
                 Item item = storage.get(shelf)[compartment];
-                if(item != null && item.getName().equals(name)){
-                    return new int[]{shelf, compartment};
-                }
+                return new int[]{shelf, compartment};
             }
         }
         return null;
