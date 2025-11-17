@@ -16,6 +16,6 @@ public class Main {
 
         //test checkout
         CheckOut bookOut = new CheckOut(library, "IDK", "11/15/2025");
-        bookOut.storeInfo("Cool  book");
+        bookOut.loanItem("Cool  book");
     }
 }
