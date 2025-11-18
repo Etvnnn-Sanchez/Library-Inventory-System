@@ -1,4 +1,0 @@
-Patron: IDK
-Book: Cool  book
-Due Date: 11/15/2025
-Location: [0, 0]

@@ -12,29 +12,6 @@ public class CheckOut{
         this.patron = patron;
         this.dueDate = dueDate;
     }
-/*
-    public boolean validInformation(String name){
-        List<String> names = inventory.getItemNames();
-        boolean validInfo = false;
-
-        if(!names.contains(name)){
-            System.out.println("This " + name + " does not exist.");
-        }
-        else{
-            validInfo = true;
-        }
-
-        return validInfo;
-    }
-*/
-
-    private String getPatronName(){
-        return patron;
-    }
-
-    private String getDueDate(){
-        return dueDate;
-    }
 
     public int[] getLocation(String name){
         return inventory.findItem(name);
@@ -53,7 +30,7 @@ public class CheckOut{
         }
     }
 
-    private boolean checkoutExists(String name){
+    public boolean checkoutExists(String name){
         try(Scanner scanner = new Scanner(new java.io.File("checkouts.txt"))){
             String target = "Book: " + name;
             while(scanner.hasNextLine()){
@@ -70,11 +47,9 @@ public class CheckOut{
     }
 
     public void loanItem(String name){
-        //validInformation(name);
-        storeInfo(name);
         boolean exists = checkoutExists(name);
         if(exists){
-            System.out.println("This book is already checked out.");
+            System.out.println("This " + name + " is already checked out.");
         }
         else{
             storeInfo(name);

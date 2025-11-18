@@ -17,5 +17,9 @@ public class Main {
         //test checkout
         CheckOut bookOut = new CheckOut(library, "IDK", "11/15/2025");
         bookOut.loanItem("Cool  book");
+
+        //test checkin
+        CheckIn bookIn = new CheckIn(bookOut, "IDK", "Cool  book");
+        bookIn.CheckInItem("Cool  book");
     }
 }
