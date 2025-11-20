@@ -40,13 +40,17 @@ public abstract class Item {
         return dueDate;
     }
 
-
-    public abstract String getItemDetails();
     @Override
+    // toString override
+    // Overrides toString to output base information
+    //
+    // ID: [ID]
+    // Name: [Name]
+    // Description: [Description]
     public String toString() {
-        return    "ID: " + id +
+        return  "ID: " + id +
                 "\nName: " + name +
                 "\nDescription: " + description +
-                "\n" + getItemDetails();
+                "\n";
     }
 }
