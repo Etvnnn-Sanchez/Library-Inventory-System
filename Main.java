@@ -9,17 +9,25 @@ public class Main {
         // Testing done for story 1
         //Pos Test
         library.addItem(book1, 0,5);
+        library.printItemsInStorage();
+        library.printCheckedoutItems();
 
         //Negative tests
         library.addItem(book2, 0,5);
         library.addItem(book2, 15, 15);
+        library.printItemsInStorage();
+        library.printCheckedoutItems();
 
         //test checkout
         CheckOut bookOut = new CheckOut(library, "IDK", "11/15/2025");
         bookOut.loanItem("Cool  book");
+        library.printItemsInStorage();
+        library.printCheckedoutItems();
 
         //test checkin
         CheckIn bookIn = new CheckIn(bookOut, "IDK", "Cool  book");
         bookIn.CheckInItem("Cool  book");
+        library.printItemsInStorage();
+        library.printCheckedoutItems();
     }
 }

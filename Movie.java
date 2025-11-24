@@ -21,7 +21,21 @@ public class Movie extends Item{
     }
 
     @Override
-    public String getItemDetails() {
-        return "";
+    // toString override
+    // Overrides toString to output all the information
+    // Uses item toString
+    //
+    // ID: [ID]
+    // Name: [Name]
+    // Description: [Description]
+    // Title: [Title]
+    // Director: [Director]
+    // Main Actors: [Actor1, Actor2, etc]
+    public String toString() {
+        return super.toString() +
+            "Title: " + title +
+            "\nDirector: " + director +
+            "\nMain Actors: " + String.join(", ", mainActors) +
+            "\n";
     }
 }

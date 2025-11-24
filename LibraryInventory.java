@@ -76,10 +76,48 @@ public class LibraryInventory {
     public void swapItem(int shelfA, int compartmentA, int shelfB, int compartmentB) {
     }
 
+    // Print Items in Storage
+    // Prints out the items in storage
+    // Includes shelf and compartment position (Both start at 1)
+    // Only prints out the item if it isn't checked out
+    // Styling:
+    // === ITEMS IN STORAGE ===
+    // Shelf [num] Compartment [num]
+    // (Item details here)
     public void printItemsInStorage() {
+        System.out.println("\n=== ITEMS IN STORAGE ===");         // Print out header
+        for (int shelf = 0; shelf < storage.size(); shelf++) {          // Loop over the shelf
+            for (int compartment = 0; compartment < storage.get(shelf).length; compartment++) {     // Loop over the compartment
+                if (getItem(shelf, compartment) != null) {          // If item isn't null
+                    if (!getItem(shelf, compartment).isCheckedOut()) {       // Check if current item is checked out already
+                        System.out.println("Shelf [" + (shelf + 1) + "] Compartment [" + (compartment + 1) + "]");        // If so, print out shelf and compartment details
+                        System.out.println(getItem(shelf, compartment).toString());         // print out the item's details
+                    }
+                }
+            }
+        }
     }
 
+    // Print Items in Storage
+    // Prints out the items in storage
+    // Includes shelf and compartment position (Both start at 1)
+    // Only prints out the item if it is checked out
+    // Styling:
+    // === ITEMS CHECKED OUT ===
+    // Shelf [num] Compartment [num]
+    // (Item details here)
     public void printCheckedoutItems() {
+        System.out.println("\n=== ITEMS CHECKED OUT ===");
+        for (int shelf = 0; shelf < storage.size(); shelf++) {          // Loop over the shelf
+            for (int compartment = 0; compartment < storage.get(shelf).length; compartment++) {     // Loop over the compartment
+                if (getItem(shelf, compartment) != null) {          // If item isn't null
+                    if (getItem(shelf, compartment).isCheckedOut()) {       // Check if current item isn't checked out already
+                        System.out.println("Shelf [" + (shelf + 1) + "] Compartment [" + (compartment + 1) + "]");        // If so, print out shelf and compartment details
+                        System.out.println(getItem(shelf, compartment).toString());         // print out the item's details
+                    }
+                }
+            }
+        }
     }
 
     public void saveInventory() {

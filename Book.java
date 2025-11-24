@@ -10,12 +10,6 @@ public class Book extends Item{
         this.copyrightDate = copyrightDate;
     }
 
-    @Override
-    public String getItemDetails() {
-        return "";
-    }
-
-
     // Getter methods
     public String getTitle() {
         return title;
@@ -27,5 +21,24 @@ public class Book extends Item{
 
     public String getCopyrightDate() {
         return copyrightDate;
+    }
+
+    @Override
+    // toString override
+    // Overrides toString to output all the information
+    // Uses item toString
+    //
+    // ID: [ID]
+    // Name: [Name]
+    // Description: [Description]
+    // Title: [Title]
+    // Author: [Author]
+    // Copyright Date: [Copyright Date]
+    public String toString() {
+        return super.toString() +
+            "Title: " + title +
+            "\nAuthor: " + author +
+            "\nCopyright Date: " + copyrightDate +
+            "\n";
     }
 }

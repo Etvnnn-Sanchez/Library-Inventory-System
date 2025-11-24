@@ -21,11 +21,22 @@ public class Magazine extends Item{
         return mainArticle;
     }
 
-
     @Override
-    public String getItemDetails() {
-        return "";
+    // toString override
+    // Overrides toString to output all the information
+    // Uses item toString
+    //
+    // ID: [ID]
+    // Name: [Name]
+    // Description: [Description]
+    // Title: [Title]
+    // Edition: [Edition]
+    // Main Article: [Main Article]
+    public String toString() {
+        return super.toString() + 
+            "Title: " + title +
+            "\nEdition: " + edition +
+            "\nMain Article: " + mainArticle +
+            "\n";
     }
-
-
 }
