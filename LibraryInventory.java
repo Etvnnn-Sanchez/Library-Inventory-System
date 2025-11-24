@@ -74,6 +74,38 @@ public class LibraryInventory {
     }
 
     public void swapItem(int shelfA, int compartmentA, int shelfB, int compartmentB) {
+        if (!isValid(shelfA, compartmentA))
+        {
+            System.err.println("Cannot switch items. The specified location [" + shelfA + "]["
+            + compartmentA + "] is out of bounds.");
+        }
+        else if (!isValid(shelfB, compartmentB))
+        {
+            System.err.println("Cannot switch items. The specified location [" + shelfB + "]["
+            + compartmentB + "] is out of bounds.");
+        }
+        else
+        {
+            if(storage.get(shelfA)[compartmentA] == null) {
+                System.err.println("Cannot add item. The specified location [" + shelfA + "]["
+                + compartmentA + "] is empty.");
+                return;
+            }
+            else if(storage.get(shelfB)[compartmentB] == null) {
+                System.err.println("Cannot add item. The specified location [" + shelfB + "]["
+                    + compartmentB + "] is empty.");
+                return;
+            }
+            Item swappedItem =  storage.get(shelfA)[compartmentA];
+            storage.get(shelfA)[compartmentA] = storage.get(shelfB)[compartmentB];
+            storage.get(shelfB)[compartmentB] = swappedItem;
+            
+            System.out.println("The items in [" + shelfA + "][" + compartmentA + "]) and [" + shelfB + "]["
+                    + compartmentB + "] have been switched.");
+            
+            return;
+            
+        }
     }
 
     // Print Items in Storage
@@ -127,3 +159,4 @@ public class LibraryInventory {
         return null;
     }
 }
+
