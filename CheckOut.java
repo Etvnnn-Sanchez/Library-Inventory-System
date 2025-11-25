@@ -53,6 +53,13 @@ public class CheckOut{
         }
         else{
             storeInfo(name);
+            int[] location = getLocation(name);
+            if (location != null) {
+                Item item = inventory.getItem(location[0], location[1]);
+                item.setCheckedOut(true);
+                item.setCheckedOutBy(patron);
+                item.setDueDate(dueDate);
+            }
             System.out.println("You have successfully checked out " + name + ". It is due on " + dueDate + ".");
         }
     }

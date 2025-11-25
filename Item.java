@@ -53,4 +53,16 @@ public abstract class Item implements java.io.Serializable {
                 "\nDescription: " + description +
                 "\n";
     }
+
+    public void setCheckedOut(boolean status) {
+        this.checkedOut = status;
+    }
+
+    public void setCheckedOutBy(String patronName) {
+        this.checkedOutBy = patronName;
+    }
+
+    public void setDueDate(String dueDate) {
+        this.dueDate = dueDate;
+    }
 }

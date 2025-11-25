@@ -4,11 +4,13 @@ import java.io.IOException;
 import java.util.*;
 
 public class CheckIn {
+    private LibraryInventory inventory;
     private CheckOut checkOut;
     private String patron;
     private String name;
 
-    public CheckIn(CheckOut checkOut, String patron, String name){
+    public CheckIn(LibraryInventory inventory, CheckOut checkOut, String patron, String name){
+        this.inventory = inventory;
         this.checkOut = checkOut;
         this.patron = patron;
         this.name = name;
@@ -50,6 +52,13 @@ public class CheckIn {
     public void CheckInItem(String name){
         if(checkOut.checkoutExists(name)){
             removeList(name);
+            int[] location = inventory.findItem(name);
+            if (location != null) {
+                Item item = inventory.getItem(location[0], location[1]);
+                item.setCheckedOut(false);
+                item.setCheckedOutBy(null);
+                item.setDueDate(null);
+            }
             System.out.println("You have successfully checked in " + name + ".");
         }
         else{

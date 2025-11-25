@@ -46,11 +46,11 @@ public class LibraryInventory implements java.io.Serializable {
     }
 
     /* I need this function simply to check if there is a valid name in the database when doing my edgecases. */
-    public List<String> getItemNames(){
+    public List<String> getItemNames() {
         List<String> names = new ArrayList<>();
-        for(Item[] shelf : storage){
-            for(Item item : shelf){
-                if(item != null){
+        for (Item[] shelf : storage) {
+            for (Item item : shelf) {
+                if (item != null) {
                     names.add(item.getName());
                 }
             }
@@ -58,11 +58,13 @@ public class LibraryInventory implements java.io.Serializable {
         return names;
     }
 
-    public int[] findItem(String name){
-        for(int shelf = 0; shelf < storage.size(); shelf++){
-            for(int compartment = 0; compartment < COMPARTMENTS; compartment++){
+    public int[] findItem(String name) {
+        for (int shelf = 0; shelf < storage.size(); shelf++) {
+            for (int compartment = 0; compartment < COMPARTMENTS; compartment++) {
                 Item item = storage.get(shelf)[compartment];
-                return new int[]{shelf, compartment};
+                if (item != null && item.getName().equals(name)) {
+                    return new int[]{shelf, compartment};
+                }
             }
         }
         return null;
@@ -75,37 +77,31 @@ public class LibraryInventory implements java.io.Serializable {
     }
 
     public void swapItem(int shelfA, int compartmentA, int shelfB, int compartmentB) {
-        if (!isValid(shelfA, compartmentA))
-        {
+        if (!isValid(shelfA, compartmentA)) {
             System.err.println("Cannot switch items. The specified location [" + shelfA + "]["
-            + compartmentA + "] is out of bounds.");
-        }
-        else if (!isValid(shelfB, compartmentB))
-        {
+                    + compartmentA + "] is out of bounds.");
+        } else if (!isValid(shelfB, compartmentB)) {
             System.err.println("Cannot switch items. The specified location [" + shelfB + "]["
-            + compartmentB + "] is out of bounds.");
-        }
-        else
-        {
-            if(storage.get(shelfA)[compartmentA] == null) {
+                    + compartmentB + "] is out of bounds.");
+        } else {
+            if (storage.get(shelfA)[compartmentA] == null) {
                 System.err.println("Cannot add item. The specified location [" + shelfA + "]["
-                + compartmentA + "] is empty.");
+                        + compartmentA + "] is empty.");
                 return;
-            }
-            else if(storage.get(shelfB)[compartmentB] == null) {
+            } else if (storage.get(shelfB)[compartmentB] == null) {
                 System.err.println("Cannot add item. The specified location [" + shelfB + "]["
-                    + compartmentB + "] is empty.");
+                        + compartmentB + "] is empty.");
                 return;
             }
-            Item swappedItem =  storage.get(shelfA)[compartmentA];
+            Item swappedItem = storage.get(shelfA)[compartmentA];
             storage.get(shelfA)[compartmentA] = storage.get(shelfB)[compartmentB];
             storage.get(shelfB)[compartmentB] = swappedItem;
-            
+
             System.out.println("The items in [" + shelfA + "][" + compartmentA + "]) and [" + shelfB + "]["
                     + compartmentB + "] have been switched.");
-            
+
             return;
-            
+
         }
     }
 
@@ -154,31 +150,24 @@ public class LibraryInventory implements java.io.Serializable {
     }
 
     public void saveInventory() {
-        try ( // Create an output stream for file library.dat
-            ObjectOutputStream output = new ObjectOutputStream(new FileOutputStream("library.dat", false));
-            ) {
-
-                // Iterate through every shelf and compartment and write each object to file
-
-                ///* 
-                for (int shelf = 0; shelf < storage.size(); shelf++) {
-                    for (int compartment = 0; compartment < storage.get(shelf).length; compartment++) { 
-                        if (getItem(shelf, compartment) != null) {
-                            output.writeObject(getItem(shelf, compartment));
-                        }
-                    }
-                }
-                //*/
-                //output.writeObject(storage);
-                output.close();
-            }
-            catch(IOException ex){
-                
-            } 
+        try (ObjectOutputStream output = new ObjectOutputStream(new FileOutputStream("library.dat", false))) {
+            output.writeObject(this); // Saves the whole library structure
+            System.out.println("Inventory saved successfully.");
+        } catch (IOException ex) {
+            System.err.println("Error saving inventory: " + ex.getMessage());
+        }
     }
 
     public static LibraryInventory restoreInventory() {
-        return null;
+        File file = new File("library.dat");
+        if (!file.exists()) return null;
+
+        try (ObjectInputStream input = new ObjectInputStream(new FileInputStream(file))) {
+            System.out.println("Inventory restored successfully.");
+            return (LibraryInventory) input.readObject();
+        } catch (Exception ex) {
+            return null;
+        }
     }
 }
 
