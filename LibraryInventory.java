@@ -1,7 +1,8 @@
+import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class LibraryInventory {
+public class LibraryInventory implements java.io.Serializable {
 
     private static final int COMPARTMENTS = 15;
     private List<Item[]> storage;
@@ -153,6 +154,27 @@ public class LibraryInventory {
     }
 
     public void saveInventory() {
+        try ( // Create an output stream for file library.dat
+            ObjectOutputStream output = new ObjectOutputStream(new FileOutputStream("library.dat", false));
+            ) {
+
+                // Iterate through every shelf and compartment and write each object to file
+
+                ///* 
+                for (int shelf = 0; shelf < storage.size(); shelf++) {
+                    for (int compartment = 0; compartment < storage.get(shelf).length; compartment++) { 
+                        if (getItem(shelf, compartment) != null) {
+                            output.writeObject(getItem(shelf, compartment));
+                        }
+                    }
+                }
+                //*/
+                //output.writeObject(storage);
+                output.close();
+            }
+            catch(IOException ex){
+                
+            } 
     }
 
     public static LibraryInventory restoreInventory() {
