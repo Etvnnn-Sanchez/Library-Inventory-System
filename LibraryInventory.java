@@ -2,148 +2,196 @@ import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class LibraryInventory implements java.io.Serializable {
-
-    private static final int COMPARTMENTS = 15;
-    private List<Item[]> storage;
-
-    private boolean isValid(int shelf, int compartment) {
-        if (shelf < 0 || shelf >= storage.size()) {
-            return false;
-        }
-        if (compartment < 0 || compartment >= COMPARTMENTS) {
-            return false;
-        }
-        return true;
-    }
+public class LibraryInventory implements Serializable {
+    private Compartment[][] storage;
+    private static final int COMPARTMENTS_PER_SHELF = 15;
+    private int numShelves;
 
     public LibraryInventory(int numShelves) {
-        storage = new ArrayList<>(numShelves);
+        this.numShelves = numShelves;
+        // Initialize the 2D array
+        storage = new Compartment[numShelves][COMPARTMENTS_PER_SHELF];
+
+        // Populate the 2D array with empty Compartments
         for (int i = 0; i < numShelves; i++) {
-            this.storage.add(new Item[COMPARTMENTS]);
+            for (int j = 0; j < COMPARTMENTS_PER_SHELF; j++) {
+                storage[i][j] = new Compartment();
+            }
         }
+    }
+
+    private boolean isValid(int shelf, int compartment) {
+        if (shelf < 0 || shelf >= numShelves) return false;
+        if (compartment < 0 || compartment >= COMPARTMENTS_PER_SHELF) return false;
+        return true;
     }
 
     public void addItem(Item item, int shelf, int compartment) {
         if (!isValid(shelf, compartment)) {
-            System.err.println("Cannot add item. The specified location [" + shelf + "]["
-                    + compartment + "] is out of bounds.");
-            return;
-        }
-        if (storage.get(shelf)[compartment] != null) {
-            System.err.println("Cannot add item. The specified location [" + shelf + "]["
-                    + compartment + "] is already occupied by another item.");
+            System.err.println("Error: Location out of bounds.");
             return;
         }
 
-        storage.get(shelf)[compartment] = item;
-        System.out.println(item.getName() + "(ID: " + item.getId() + ") has been successfully added at ["
-                + shelf + "][" + compartment + "].");
+        Compartment comp = storage[shelf][compartment];
+
+        if (!comp.isEmpty()) {
+            System.err.println("Error: Compartment is occupied.");
+            return;
+        }
+
+        comp.setItem(item);
+        System.out.println(item.getName() + " added to [" + shelf + "][" + compartment + "].");
     }
 
     public Item getItem(int shelf, int compartment) {
-        return storage.get(shelf)[compartment];
+        if (isValid(shelf, compartment)) {
+            return storage[shelf][compartment].getItem();
+        }
+        return null;
+    }
+    public void checkoutItem(String itemName, String patron, String dueDate) {
+        int[] loc = findItem(itemName);
+        if (loc == null) {
+            System.out.println("Item not found: " + itemName);
+            return;
+        }
+
+        Compartment comp = storage[loc[0]][loc[1]];
+
+        if (comp.isCheckedOut()) {
+            System.out.println("Error: Item is already checked out.");
+        } else {
+            comp.setCheckoutRecord(new CheckoutRecord(patron, dueDate));
+            System.out.println("Success: " + itemName + " checked out.");
+        }
     }
 
-    /* I need this function simply to check if there is a valid name in the database when doing my edgecases. */
-    public List<String> getItemNames() {
-        List<String> names = new ArrayList<>();
-        for (Item[] shelf : storage) {
-            for (Item item : shelf) {
-                if (item != null) {
-                    names.add(item.getName());
-                }
-            }
+    public void checkinItem(String itemName) {
+        int[] loc = findItem(itemName);
+        if (loc == null) {
+            System.out.println("Item not found.");
+            return;
         }
-        return names;
+
+        Compartment comp = storage[loc[0]][loc[1]];
+
+        if (!comp.isCheckedOut()) {
+            System.out.println("Item is not currently checked out.");
+        } else {
+            comp.clearRecord();
+            System.out.println("Success: " + itemName + " returned.");
+        }
     }
 
     public int[] findItem(String name) {
-        for (int shelf = 0; shelf < storage.size(); shelf++) {
-            for (int compartment = 0; compartment < COMPARTMENTS; compartment++) {
-                Item item = storage.get(shelf)[compartment];
-                if (item != null && item.getName().equals(name)) {
-                    return new int[]{shelf, compartment};
+        for (int i = 0; i < numShelves; i++) {
+            for (int j = 0; j < COMPARTMENTS_PER_SHELF; j++) {
+                Compartment comp = storage[i][j];
+                if (!comp.isEmpty() && comp.getItem().getName().equals(name)) {
+                    return new int[]{i, j};
                 }
             }
         }
         return null;
     }
 
-    public void checkoutItem(int shelf, int compartment) {
-    }
-
-    public void checkinItem(int shelf, int compartment) {
-    }
-
-    public void swapItem(int shelfA, int compartmentA, int shelfB, int compartmentB) {
-        if (!isValid(shelfA, compartmentA)) {
-            System.err.println("Cannot switch items. The specified location [" + shelfA + "]["
-                    + compartmentA + "] is out of bounds.");
-        } else if (!isValid(shelfB, compartmentB)) {
-            System.err.println("Cannot switch items. The specified location [" + shelfB + "]["
-                    + compartmentB + "] is out of bounds.");
-        } else {
-            if (storage.get(shelfA)[compartmentA] == null) {
-                System.err.println("Cannot add item. The specified location [" + shelfA + "]["
-                        + compartmentA + "] is empty.");
-                return;
-            } else if (storage.get(shelfB)[compartmentB] == null) {
-                System.err.println("Cannot add item. The specified location [" + shelfB + "]["
-                        + compartmentB + "] is empty.");
-                return;
-            }
-            Item swappedItem = storage.get(shelfA)[compartmentA];
-            storage.get(shelfA)[compartmentA] = storage.get(shelfB)[compartmentB];
-            storage.get(shelfB)[compartmentB] = swappedItem;
-
-            System.out.println("The items in [" + shelfA + "][" + compartmentA + "]) and [" + shelfB + "]["
-                    + compartmentB + "] have been switched.");
-
+    public void swapItem(int shelfA, int compA, int shelfB, int compB) {
+        if (!isValid(shelfA, compA) || !isValid(shelfB, compB)) {
+            System.err.println("Invalid locations.");
             return;
-
         }
+
+        Compartment c1 = storage[shelfA][compA];
+        Compartment c2 = storage[shelfB][compB];
+
+        if (c1.isEmpty() || c2.isEmpty()) {
+            System.err.println("Both compartments must have items to swap.");
+            return;
+        }
+
+        // Swap contents (Item AND Record)
+        Item tempItem = c1.getItem();
+        CheckoutRecord tempRecord = c1.getCheckoutRecord();
+
+        c1.setItem(c2.getItem());
+        c1.setCheckoutRecord(c2.getCheckoutRecord());
+
+        c2.setItem(tempItem);
+        c2.setCheckoutRecord(tempRecord);
+
+        System.out.println("Items swapped.");
     }
 
-    // Print Items in Storage
-    // Prints out the items in storage
-    // Includes shelf and compartment position (Both start at 1)
-    // Only prints out the item if it isn't checked out
-    // Styling:
-    // === ITEMS IN STORAGE ===
-    // Shelf [num] Compartment [num]
-    // (Item details here)
-    public void printItemsInStorage() {
-        System.out.println("\n=== ITEMS IN STORAGE ===");         // Print out header
-        for (int shelf = 0; shelf < storage.size(); shelf++) {          // Loop over the shelf
-            for (int compartment = 0; compartment < storage.get(shelf).length; compartment++) {     // Loop over the compartment
-                if (getItem(shelf, compartment) != null) {          // If item isn't null
-                    if (!getItem(shelf, compartment).isCheckedOut()) {       // Check if current item is checked out already
-                        System.out.println("Shelf [" + (shelf + 1) + "] Compartment [" + (compartment + 1) + "]");        // If so, print out shelf and compartment details
-                        System.out.println(getItem(shelf, compartment).toString());         // print out the item's details
+    public void printItemsInStorage(){
+        System.out.println("\n==========================================");
+        System.out.println("            LIBRARY SHELF MAP             ");
+        System.out.println("==========================================");
+        System.out.println("Key: [ ]=Empty  [B]=Book  [M]=Movie  [Z]=Magazine  [X]=Checked Out");
+        System.out.println("      01 02 03 04 05 06 07 08 09 10 11 12 13 14 15");
+
+        for (int i = 0; i < numShelves; i++) {
+            System.out.printf("S%02d: ", (i + 1)); // Print Shelf Number (e.g., S01)
+
+            for (int j = 0; j < COMPARTMENTS_PER_SHELF; j++) {
+                Compartment comp = storage[i][j];
+
+                if (comp.isEmpty()) {
+                    System.out.print("[ ]");
+                }
+                else if (comp.isCheckedOut()) {
+                    System.out.print("[X]"); // Occupied but checked out
+                }
+                else {
+                    // Determine type for the code letter
+                    Item item = comp.getItem();
+                    if (item instanceof Book) {
+                        System.out.print("[B]");
+                    } else if (item instanceof Movie) {
+                        System.out.print("[M]");
+                    } else if (item instanceof Magazine) {
+                        System.out.print("[Z]");
+                    } else {
+                        System.out.print("[?]");
                     }
                 }
             }
+            System.out.println(); // New line after each shelf
         }
+
+        System.out.println("\n------------------------------------------");
+        System.out.println("          ITEM DETAILS (AVAILABLE)        ");
+        System.out.println("------------------------------------------");
+
+        boolean foundItem = false;
+        for (int i = 0; i < numShelves; i++) {
+            for (int j = 0; j < COMPARTMENTS_PER_SHELF; j++) {
+                Compartment comp = storage[i][j];
+
+                // We only print details if it is NOT empty and NOT checked out
+                if (!comp.isEmpty() && !comp.isCheckedOut()) {
+                    System.out.println("Location: Shelf " + (i + 1) + " / Compartment " + (j + 1));
+                    System.out.println(comp.getItem().toString());
+                    foundItem = true;
+                }
+            }
+        }
+
+        if (!foundItem) {
+            System.out.println("(No items currently on shelves)");
+        }
+        System.out.println("==========================================\n");
     }
 
-    // Print Items in Storage
-    // Prints out the items in storage
-    // Includes shelf and compartment position (Both start at 1)
-    // Only prints out the item if it is checked out
-    // Styling:
-    // === ITEMS CHECKED OUT ===
-    // Shelf [num] Compartment [num]
-    // (Item details here)
     public void printCheckedoutItems() {
         System.out.println("\n=== ITEMS CHECKED OUT ===");
-        for (int shelf = 0; shelf < storage.size(); shelf++) {          // Loop over the shelf
-            for (int compartment = 0; compartment < storage.get(shelf).length; compartment++) {     // Loop over the compartment
-                if (getItem(shelf, compartment) != null) {          // If item isn't null
-                    if (getItem(shelf, compartment).isCheckedOut()) {       // Check if current item isn't checked out already
-                        System.out.println("Shelf [" + (shelf + 1) + "] Compartment [" + (compartment + 1) + "]");        // If so, print out shelf and compartment details
-                        System.out.println(getItem(shelf, compartment).toString());         // print out the item's details
-                    }
+        for (int i = 0; i < numShelves; i++) {
+            for (int j = 0; j < COMPARTMENTS_PER_SHELF; j++) {
+                Compartment comp = storage[i][j];
+                // Only print if there is an item and it IS checked out
+                if (!comp.isEmpty() && comp.isCheckedOut()) {
+                    System.out.println("Shelf [" + (i + 1) + "] Compartment [" + (j + 1) + "]");
+                    System.out.println(comp.getItem().toString());
+                    System.out.println(comp.getCheckoutRecord().toString() + "\n");
                 }
             }
         }
@@ -151,23 +199,27 @@ public class LibraryInventory implements java.io.Serializable {
 
     public void saveInventory() {
         try (ObjectOutputStream output = new ObjectOutputStream(new FileOutputStream("library.dat", false))) {
-            output.writeObject(this); // Saves the whole library structure
-            System.out.println("Inventory saved successfully.");
+            output.writeObject(this);
+            System.out.println("Inventory saved.");
         } catch (IOException ex) {
-            System.err.println("Error saving inventory: " + ex.getMessage());
+            ex.printStackTrace();
         }
     }
 
     public static LibraryInventory restoreInventory() {
         File file = new File("library.dat");
         if (!file.exists()) return null;
-
         try (ObjectInputStream input = new ObjectInputStream(new FileInputStream(file))) {
-            System.out.println("Inventory restored successfully.");
             return (LibraryInventory) input.readObject();
         } catch (Exception ex) {
             return null;
         }
     }
-}
 
+    public Compartment getCompartment(int shelf, int compartment) {
+        if (isValid(shelf, compartment)) {
+            return storage[shelf][compartment];
+        }
+        return null;
+    }
+}

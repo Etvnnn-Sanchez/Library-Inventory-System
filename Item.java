@@ -3,17 +3,10 @@ public abstract class Item implements java.io.Serializable {
     private String description;
     private String id;
 
-    private boolean checkedOut;
-    private String checkedOutBy;
-    private String dueDate;
-
     public Item(String name, String description, String id) {
         this.name = name;
         this.description = description;
         this.id = id;
-        this.checkedOut = false;
-        this.checkedOutBy = null;
-        this.dueDate = null;
     }
 
     public String getName() {
@@ -26,18 +19,6 @@ public abstract class Item implements java.io.Serializable {
 
     public String getId() {
         return id;
-    }
-
-    public boolean isCheckedOut() {
-        return checkedOut;
-    }
-
-    public String getCheckedOutBy() {
-        return checkedOutBy;
-    }
-
-    public String getDueDate() {
-        return dueDate;
     }
 
     @Override
@@ -54,15 +35,4 @@ public abstract class Item implements java.io.Serializable {
                 "\n";
     }
 
-    public void setCheckedOut(boolean status) {
-        this.checkedOut = status;
-    }
-
-    public void setCheckedOutBy(String patronName) {
-        this.checkedOutBy = patronName;
-    }
-
-    public void setDueDate(String dueDate) {
-        this.dueDate = dueDate;
-    }
 }

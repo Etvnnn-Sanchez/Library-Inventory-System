@@ -1,8 +1,4 @@
-import java.io.FileWriter;
-import java.io.IOException;
-import java.util.*;
-
-public class CheckOut{
+public class CheckOut {
     private LibraryInventory inventory;
     private String patron;
     private String dueDate;
@@ -13,54 +9,30 @@ public class CheckOut{
         this.dueDate = dueDate;
     }
 
-    public int[] getLocation(String name){
-        return inventory.findItem(name);
-    }
-    
-    private void storeInfo(String name){
-        int[] location = getLocation(name);
-        try(FileWriter writer = new FileWriter("checkouts.txt", true)){
-            writer.write("Patron: " + patron + "\n");
-            writer.write("Book: " + name + "\n");
-            writer.write("Due Date: " + dueDate + "\n");
-            writer.write("Location: [" + location[0] + ", " + location[1] + "]\n");
-        }
-        catch(IOException e){
-            System.out.println("Invalid information, unable to store data");
-        }
-    }
-
-    public boolean checkoutExists(String name){
-        try(Scanner scanner = new Scanner(new java.io.File("checkouts.txt"))){
-            String target = "Book: " + name;
-            while(scanner.hasNextLine()){
-                String line = scanner.nextLine();
-                if (line.equals(target)) {
-                    return true;
-                }
-            }
-        } 
-        catch(IOException e){
-            System.out.println("Could not read checkouts.txt");
-        }
-        return false;
-    }
-
     public void loanItem(String name){
-        boolean exists = checkoutExists(name);
-        if(exists){
-            System.out.println("This " + name + " is already checked out.");
+        // Find where the item is stored
+        int[] location = inventory.findItem(name);
+
+        if(location == null){
+            System.out.println("Item not found: " + name);
+            return;
         }
-        else{
-            storeInfo(name);
-            int[] location = getLocation(name);
-            if (location != null) {
-                Item item = inventory.getItem(location[0], location[1]);
-                item.setCheckedOut(true);
-                item.setCheckedOutBy(patron);
-                item.setDueDate(dueDate);
-            }
-            System.out.println("You have successfully checked out " + name + ". It is due on " + dueDate + ".");
+
+        // Get the specific compartment object
+        Compartment comp = inventory.getCompartment(location[0], location[1]);
+
+        // Check internal state (Memory), not a text file
+        if(comp.isCheckedOut()){
+            System.out.println("This " + name + " is already checked out by " +
+                    comp.getCheckoutRecord().getPatronName());
+        }
+        else {
+            // Create the Record and attach it to the Compartment
+            CheckoutRecord record = new CheckoutRecord(patron, dueDate);
+            comp.setCheckoutRecord(record);
+
+            System.out.println("You have successfully checked out " + name +
+                    ". It is due on " + dueDate + ".");
         }
     }
 }
